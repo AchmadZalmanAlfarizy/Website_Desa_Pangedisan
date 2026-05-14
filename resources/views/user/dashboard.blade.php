@@ -7,9 +7,9 @@
     <ol class="breadcrumb"><li class="breadcrumb-item active">Beranda</li></ol>
 </div>
 
-<div class="alert alert-primary border-0 rounded-3 mb-4" style="background:linear-gradient(135deg,#eff6ff,#dbeafe);">
+<div class="alert border-0 rounded-3 mb-4" style="background:linear-gradient(135deg,#f0fdf4,#dcfce7);border-left:4px solid #22c55e!important;">
     <div class="d-flex align-items-center">
-        <i class="bi bi-hand-wave-fill fs-2 me-3 text-primary"></i>
+        <i class="bi bi-hand-wave-fill fs-2 me-3" style="color:var(--primary,#15803d);"></i>
         <div>
             <h6 class="mb-0">Halo, <strong>{{ auth()->user()->name }}</strong>! 👋</h6>
             <small class="text-muted">Selamat datang di portal layanan Desa Pagendisan.</small>

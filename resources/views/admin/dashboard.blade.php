@@ -188,8 +188,8 @@ new Chart(document.getElementById('chartPengajuan'), {
         datasets: [{
             label: 'Jumlah Pengajuan',
             data: counts,
-            backgroundColor: 'rgba(59,130,246,.75)',
-            borderColor: '#1e40af',
+            backgroundColor: 'rgba(21,128,61,.75)',
+            borderColor: '#15803d',
             borderWidth: 1.5,
             borderRadius: 6,
         }]

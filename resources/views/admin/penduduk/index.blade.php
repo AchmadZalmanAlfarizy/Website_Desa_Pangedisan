@@ -59,7 +59,7 @@
                         </td>
                         <td>
                             @if($p->jenis_kelamin === 'Laki-laki')
-                                <span class="badge" style="background:#eff6ff;color:#1e40af;">L</span>
+                                <span class="badge" style="background:#f0fdf4;color:#15803d;">L</span>
                             @else
                                 <span class="badge" style="background:#fdf2f8;color:#9333ea;">P</span>
                             @endif
