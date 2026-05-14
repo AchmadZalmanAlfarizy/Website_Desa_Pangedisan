@@ -22,38 +22,60 @@
             background: rgba(255,255,255,.95) !important;
             backdrop-filter: blur(10px);
             box-shadow: 0 1px 20px rgba(0,0,0,.08);
-            padding: .75rem 0;
+            padding: .4rem 0;
         }
-        .navbar-brand { font-weight: 800; color: var(--primary) !important; font-size: 1.1rem; }
+        .navbar-brand { font-weight: 800; color: var(--primary) !important; font-size: 0.95rem; }
         .nav-link { font-weight: 500; color: #374151 !important; font-size: .9rem; }
         .nav-link:hover { color: var(--primary) !important; }
 
         /* ── Hero ──────────────────────────── */
         .hero-section {
             min-height: 100vh;
-            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #1e40af 100%);
+            background-image: url('/images/kantor-desa.jpg');
+            background-position: center;
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
             position: relative;
             overflow: hidden;
             display: flex;
             align-items: center;
         }
+        
+        /* Overlay subtle untuk background image dengan blur effect */
         .hero-section::before {
             content: '';
             position: absolute;
-            top: -50%; left: -20%;
-            width: 600px; height: 600px;
-            background: radial-gradient(circle, rgba(59,130,246,.2) 0%, transparent 70%);
-            border-radius: 50%;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(
+                135deg,
+                rgba(0, 0, 0, 0.50) 0%,
+                rgba(0, 0, 0, 0.40) 50%,
+                rgba(0, 0, 0, 0.55) 100%
+            );
+            z-index: 1;
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
         }
+        
+        /* Vignette effect - lebih gelap di tepi */
         .hero-section::after {
             content: '';
             position: absolute;
-            bottom: -20%; right: -10%;
-            width: 500px; height: 500px;
-            background: radial-gradient(circle, rgba(5,150,105,.15) 0%, transparent 70%);
-            border-radius: 50%;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(
+                ellipse at center,
+                rgba(0, 0, 0, 0) 0%,
+                rgba(0, 0, 0, 0.15) 100%
+            );
+            z-index: 2;
+            pointer-events: none;
         }
-        .hero-content { position: relative; z-index: 2; }
+        
+        .hero-content { 
+            position: relative; 
+            z-index: 3;
+        }
 
         .hero-badge {
             display: inline-flex;
@@ -75,15 +97,17 @@
             color: #fff;
             line-height: 1.2;
             margin-bottom: 1.25rem;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
         }
         .hero-title span { color: #60a5fa; }
 
         .hero-subtitle {
             font-size: 1.05rem;
-            color: #94a3b8;
+            color: #e2e8f0;
             line-height: 1.7;
             margin-bottom: 2rem;
             max-width: 520px;
+            text-shadow: 0 1px 5px rgba(0, 0, 0, 0.2);
         }
 
         .hero-info {

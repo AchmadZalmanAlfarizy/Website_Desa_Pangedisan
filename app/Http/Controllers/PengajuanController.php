@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ArsipDokumen;
 use App\Models\JenisSurat;
 use App\Models\Penduduk;
 use App\Models\Pengajuan;
@@ -9,6 +10,8 @@ use App\Models\Surat;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class PengajuanController extends Controller
 {
@@ -63,7 +66,7 @@ class PengajuanController extends Controller
 
         $noSurat   = Surat::generateNoSurat($pengajuan->jenisSurat->kode);
 
-        Surat::create([
+        $surat = Surat::create([
             'no_surat'      => $noSurat,
             'pengajuan_id'  => $pengajuan->id,
             'penduduk_id'   => $penduduk->id,
@@ -72,8 +75,45 @@ class PengajuanController extends Controller
             'keperluan'     => $pengajuan->keperluan,
         ]);
 
+        // ===== Buat Arsip Otomatis =====
+        try {
+            // Load relasi untuk PDF
+            $surat->load(['penduduk', 'jenisSurat', 'pengajuan.user']);
+
+            // Generate PDF
+            $pdf = Pdf::loadView('pdf.surat', compact('surat'))
+                ->setPaper('a4', 'portrait');
+
+            // Siapkan path file
+            $filename = 'Surat_' . str_replace('/', '_', $surat->no_surat) . '.pdf';
+            $path = 'arsip/surat/' . now()->format('Y/m') . '/' . $filename;
+
+            // Simpan PDF ke storage
+            Storage::disk('public')->put($path, $pdf->output());
+
+            // Ambil ukuran file
+            $fileSize = Storage::disk('public')->size($path);
+
+            // Buat record di arsip_dokumen
+            ArsipDokumen::create([
+                'judul'       => $surat->jenisSurat->nama . ' - ' . ($penduduk->nama_lengkap ?? $pengajuan->user->name),
+                'kode_arsip'  => $surat->no_surat,
+                'kategori'    => $surat->jenisSurat->nama,
+                'deskripsi'   => 'Arsip otomatis dari pengajuan ' . $pengajuan->no_pengajuan . ' - ' . $pengajuan->keperluan,
+                'tahun'       => now()->year,
+                'file_path'   => $path,
+                'file_name'   => $filename,
+                'file_type'   => 'application/pdf',
+                'file_size'   => $fileSize,
+                'user_id'     => Auth::id(),
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error membuat arsip otomatis: ' . $e->getMessage());
+            // Tidak menggagalkan approve() jika arsip gagal dibuat
+        }
+
         return redirect()->route('admin.pengajuan.show', $pengajuan)
-            ->with('success', 'Pengajuan disetujui dan surat berhasil dibuat.');
+            ->with('success', 'Pengajuan disetujui, surat berhasil dibuat, dan arsip otomatis tersimpan.');
     }
 
     public function selesai(Pengajuan $pengajuan)
@@ -162,18 +202,37 @@ class PengajuanController extends Controller
 
     public function downloadSurat(Surat $surat)
     {
-        // Check authorization
-        if (Auth::user()->isMasyarakat()) {
-            if ($surat->pengajuan->user_id !== Auth::id()) {
-                abort(403);
+        try {
+            // Check authorization
+            /** @var \App\Models\User $user */
+            $user = Auth::user();
+            
+            if ($user->isMasyarakat()) {
+                if ($surat->pengajuan->user_id !== Auth::id()) {
+                    abort(403, 'Anda tidak memiliki akses ke surat ini.');
+                }
             }
+
+            // Load semua relasi yang dibutuhkan
+            $surat->load(['penduduk', 'jenisSurat', 'pengajuan.user']);
+
+            // Pastikan data penduduk ada
+            if (!$surat->penduduk) {
+                return back()->with('error', 'Data penduduk tidak ditemukan. Tidak dapat membuat PDF.');
+            }
+
+            // Buat PDF
+            $pdf = Pdf::loadView('pdf.surat', compact('surat'))
+                ->setPaper('a4', 'portrait');
+
+            // Download dengan nama file yang clean
+            $fileName = 'Surat_' . str_replace('/', '_', $surat->no_surat) . '.pdf';
+            
+            return $pdf->download($fileName);
+            
+        } catch (\Exception $e) {
+            Log::error('Error generating PDF: ' . $e->getMessage());
+            return back()->with('error', 'Terjadi kesalahan saat membuat PDF: ' . $e->getMessage());
         }
-
-        $surat->load(['penduduk', 'jenisSurat', 'pengajuan.user']);
-
-        $pdf = Pdf::loadView('pdf.surat', compact('surat'))
-            ->setPaper('a4', 'portrait');
-
-        return $pdf->download('surat-' . $surat->no_surat . '.pdf');
     }
 }

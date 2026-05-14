@@ -2,7 +2,8 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>{{ $surat->no_surat }}</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>{{ $surat->no_surat ?? 'Surat' }}</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -10,6 +11,7 @@
             font-size: 12pt;
             color: #000;
             line-height: 1.5;
+            padding: 20px;
         }
         .kop {
             border-bottom: 4px double #000;
@@ -17,12 +19,13 @@
             margin-bottom: 18px;
             text-align: center;
         }
-        .kop-table { width: 100%; }
-        .kop-logo { width: 80px; text-align: center; }
+        .kop-table { width: 100%; margin-bottom: 10px; }
+        .kop-logo { width: 80px; text-align: center; vertical-align: middle; }
         .kop-logo img { width: 70px; height: 70px; }
-        .kop-teks h2 { font-size: 15pt; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
-        .kop-teks h3 { font-size: 13pt; font-weight: bold; text-transform: uppercase; }
-        .kop-teks p { font-size: 10pt; margin-top: 2px; }
+        .kop-teks { text-align: center; vertical-align: middle; }
+        .kop-teks h2 { font-size: 15pt; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 2px; }
+        .kop-teks h3 { font-size: 13pt; font-weight: bold; text-transform: uppercase; margin-bottom: 4px; }
+        .kop-teks p { font-size: 10pt; margin-top: 2px; line-height: 1.3; }
 
         .judul-surat {
             text-align: center;
@@ -34,6 +37,7 @@
             font-weight: bold;
             text-decoration: underline;
             letter-spacing: 1px;
+            margin-bottom: 6px;
         }
         .judul-surat p { font-size: 10pt; margin-top: 4px; }
 
@@ -47,24 +51,29 @@
 
         .ttd-section {
             margin-top: 30px;
-            display: flex;
-            justify-content: flex-end;
+            width: 100%;
         }
-        .ttd-box { text-align: center; width: 260px; }
+        .ttd-box { text-align: center; width: 260px; float: right; }
         .ttd-box .ttd-space { height: 70px; }
         .ttd-box .nama { font-weight: bold; text-decoration: underline; }
         .ttd-box .nip { font-size: 10pt; }
 
-        .catatan { margin-top: 20px; font-size: 10pt; color: #444; font-style: italic; }
+        .catatan { margin-top: 20px; font-size: 10pt; color: #444; font-style: italic; clear: both; }
     </style>
 </head>
 <body>
     {{-- KOP SURAT --}}
     <table class="kop-table">
         <tr>
+            @php
+                $logoPath = public_path('images/logo-desa.png');
+                $logoExists = file_exists($logoPath);
+            @endphp
+            @if($logoExists)
             <td class="kop-logo">
-                <img src="{{ public_path('images/logo-desa.png') }}" alt="Logo" onerror="this.style.display='none'">
+                <img src="{{ $logoPath }}" alt="Logo Desa">
             </td>
+            @endif
             <td class="kop-teks">
                 <h2>Pemerintah Desa Pagendisan</h2>
                 <h3>Kecamatan Winong, Kabupaten Pati</h3>
@@ -77,8 +86,8 @@
 
     {{-- JUDUL SURAT --}}
     <div class="judul-surat">
-        <h3>{{ $surat->jenisSurat->nama }}</h3>
-        <p>Nomor: {{ $surat->no_surat }}</p>
+        <h3>{{ $surat->jenisSurat->nama ?? 'SURAT KETERANGAN' }}</h3>
+        <p>Nomor: {{ $surat->no_surat ?? '-' }}</p>
     </div>
 
     {{-- ISI SURAT --}}
@@ -87,14 +96,20 @@
 
         @if($surat->penduduk)
         <table class="data-diri">
-            <tr><td>Nama Lengkap</td><td>:</td><td><strong>{{ $surat->penduduk->nama_lengkap }}</strong></td></tr>
-            <tr><td>NIK</td><td>:</td><td>{{ $surat->penduduk->nik }}</td></tr>
-            <tr><td>Tempat, Tgl. Lahir</td><td>:</td><td>{{ $surat->penduduk->tempat_lahir }}, {{ $surat->penduduk->tanggal_lahir->translatedFormat('d F Y') }}</td></tr>
-            <tr><td>Jenis Kelamin</td><td>:</td><td>{{ $surat->penduduk->jenis_kelamin }}</td></tr>
-            <tr><td>Agama</td><td>:</td><td>{{ $surat->penduduk->agama }}</td></tr>
-            <tr><td>Status Perkawinan</td><td>:</td><td>{{ $surat->penduduk->status_perkawinan }}</td></tr>
+            <tr><td>Nama Lengkap</td><td>:</td><td><strong>{{ $surat->penduduk->nama_lengkap ?? '-' }}</strong></td></tr>
+            <tr><td>NIK</td><td>:</td><td>{{ $surat->penduduk->nik ?? '-' }}</td></tr>
+            <tr><td>Tempat, Tgl. Lahir</td><td>:</td><td>
+                @if($surat->penduduk->tempat_lahir && $surat->penduduk->tanggal_lahir)
+                    {{ $surat->penduduk->tempat_lahir }}, {{ \Carbon\Carbon::parse($surat->penduduk->tanggal_lahir)->translatedFormat('d F Y') }}
+                @else
+                    -
+                @endif
+            </td></tr>
+            <tr><td>Jenis Kelamin</td><td>:</td><td>{{ $surat->penduduk->jenis_kelamin ?? '-' }}</td></tr>
+            <tr><td>Agama</td><td>:</td><td>{{ $surat->penduduk->agama ?? '-' }}</td></tr>
+            <tr><td>Status Perkawinan</td><td>:</td><td>{{ $surat->penduduk->status_perkawinan ?? '-' }}</td></tr>
             <tr><td>Pekerjaan</td><td>:</td><td>{{ $surat->penduduk->pekerjaan ?? '-' }}</td></tr>
-            <tr><td>Alamat</td><td>:</td><td>{{ $surat->penduduk->alamat }}, RT {{ $surat->penduduk->rt }}/RW {{ $surat->penduduk->rw }}, Desa Pagendisan, Kec. Winong, Kab. Pati</td></tr>
+            <tr><td>Alamat</td><td>:</td><td>{{ $surat->penduduk->alamat ?? '-' }}{{ $surat->penduduk->rt ? ', RT ' . $surat->penduduk->rt : '' }}{{ $surat->penduduk->rw ? '/RW ' . $surat->penduduk->rw : '' }}, Desa Pagendisan, Kec. Winong, Kab. Pati</td></tr>
         </table>
         @endif
 
@@ -104,26 +119,21 @@
         <p>Bahwa orang tersebut di atas adalah benar merupakan warga Desa Pagendisan, Kecamatan Winong, Kabupaten Pati, yang diketahui berkelakuan baik dan tertib hukum.</p>
         @endif
 
-        <p>Surat keterangan ini dibuat untuk keperluan: <strong>{{ $surat->keperluan }}</strong>, dan dapat dipergunakan sebagaimana mestinya.</p>
+        <p>Surat keterangan ini dibuat untuk keperluan: <strong>{{ $surat->keperluan ?? 'sebagaimana mestinya' }}</strong>, dan dapat dipergunakan sebagaimana mestinya.</p>
 
         <p>Demikian surat keterangan ini dibuat dengan sebenar-benarnya agar dapat digunakan sebagaimana mestinya.</p>
     </div>
 
     {{-- TANDA TANGAN --}}
-    <table style="width:100%;">
-        <tr>
-            <td style="width:55%;"></td>
-            <td style="text-align:center;">
-                <p>Pagendisan, {{ $surat->tanggal_surat->translatedFormat('d F Y') }}</p>
-                <p><strong>Kepala Desa Pagendisan</strong></p>
-                <br><br><br>
-                <p style="font-weight:bold;text-decoration:underline;">
-                    {{ $surat->ttd_kepala_desa ?? '(..............................)' }}
-                </p>
-            </td>
-        </tr>
-    </table>
+    <div class="ttd-section">
+        <div class="ttd-box">
+            <p>Pagendisan, {{ $surat->tanggal_surat ? \Carbon\Carbon::parse($surat->tanggal_surat)->translatedFormat('d F Y') : \Carbon\Carbon::now()->translatedFormat('d F Y') }}</p>
+            <p><strong>Kepala Desa Pagendisan</strong></p>
+            <div class="ttd-space"></div>
+            <p class="nama">{{ $surat->ttd_kepala_desa ?? '(..............................)' }}</p>
+        </div>
+    </div>
 
-    <p class="catatan">* Surat ini diterbitkan secara elektronik melalui Sistem Administrasi Desa Pagendisan. No: {{ $surat->no_surat }}</p>
+    <p class="catatan">* Surat ini diterbitkan secara elektronis melalui Sistem Administrasi Desa Pagendisan. Nomor: {{ $surat->no_surat ?? '-' }}</p>
 </body>
 </html>
