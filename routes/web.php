@@ -58,6 +58,9 @@ Route::middleware(['auth', 'masyarakat'])->prefix('user')->name('user.')->group(
     Route::get('/pengajuan/create', [PengajuanController::class, 'userCreate'])->name('pengajuan.create');
     Route::post('/pengajuan', [PengajuanController::class, 'userStore'])->name('pengajuan.store');
     Route::get('/pengajuan/{pengajuan}', [PengajuanController::class, 'userShow'])->name('pengajuan.show');
+    Route::get('/pengajuan/{pengajuan}/edit', [PengajuanController::class, 'userEdit'])->name('pengajuan.edit');
+    Route::put('/pengajuan/{pengajuan}', [PengajuanController::class, 'userUpdate'])->name('pengajuan.update');
+    Route::delete('/pengajuan/{pengajuan}', [PengajuanController::class, 'userCancel'])->name('pengajuan.cancel');
 });
 
 // ─── Download Surat PDF ───────────────────────────────────────────────────────

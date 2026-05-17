@@ -325,7 +325,7 @@
                 <li class="nav-item"><a class="nav-link px-3" href="#fitur">Fitur</a></li>
                 <li class="nav-item"><a class="nav-link px-3" href="#cara">Cara Pakai</a></li>
                 <li class="nav-item"><a class="nav-link px-3" href="#layanan">Layanan</a></li>
-                <li class="nav-item"><a class="nav-link px-3" href="#kontak">Kontak</a></li>
+
                 <li class="nav-item ms-lg-2">
                     <a href="{{ route('login') }}" class="btn-nav-login">Masuk</a>
                 </li>
@@ -428,15 +428,7 @@
                         <div class="ms-auto"><span style="color:#22c55e;font-size:.75rem;font-weight:700;">● Aktif</span></div>
                     </div>
 
-                    <div class="mt-3 pt-3" style="border-top:1px solid rgba(255,255,255,.08);">
-                        <div class="d-flex justify-content-between mb-1">
-                            <span style="color:#94a3b8;font-size:.72rem;">Tingkat Kepuasan Layanan</span>
-                            <span style="color:#4ade80;font-size:.72rem;font-weight:700;">98%</span>
-                        </div>
-                        <div style="background:rgba(255,255,255,.1);border-radius:100px;height:6px;overflow:hidden;">
-                            <div style="width:98%;height:100%;background:linear-gradient(90deg,#15803d,#4ade80);border-radius:100px;"></div>
-                        </div>
-                    </div>
+
                 </div>
             </div>
 
@@ -654,12 +646,7 @@
                 <p class="footer-desc">
                     Sistem Pelayanan Administrasi Digital Desa Pagendisan — hadir untuk kemudahan dan transparansi layanan bagi seluruh warga.
                 </p>
-                <div class="d-flex gap-2 mt-3">
-                    <a href="#" class="social-btn"><i class="bi bi-facebook"></i></a>
-                    <a href="#" class="social-btn"><i class="bi bi-instagram"></i></a>
-                    <a href="#" class="social-btn"><i class="bi bi-whatsapp"></i></a>
-                    <a href="#" class="social-btn"><i class="bi bi-youtube"></i></a>
-                </div>
+
             </div>
 
             {{-- Navigasi --}}

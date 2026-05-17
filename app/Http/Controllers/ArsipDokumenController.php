@@ -69,13 +69,12 @@ class ArsipDokumenController extends Controller
     public function download(ArsipDokumen $arsip)
     {
         if (!Storage::disk('public')->exists($arsip->file_path)) {
-            return back()->with('error', 'File tidak ditemukan.');
+            return back()->with('error', 'File arsip tidak ditemukan di server.');
         }
 
-        return response()->download(
-            Storage::disk('public')->path($arsip->file_path),
-            $arsip->file_name ?: basename($arsip->file_path)
-        );
+        $downloadName = $arsip->file_name ?: basename($arsip->file_path);
+
+        return Storage::disk('public')->download($arsip->file_path, $downloadName);
     }
 
     public function destroy(ArsipDokumen $arsip)

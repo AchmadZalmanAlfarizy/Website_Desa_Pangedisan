@@ -198,6 +198,78 @@ class PengajuanController extends Controller
         return view('user.pengajuan.show', compact('pengajuan'));
     }
 
+    public function userEdit(Pengajuan $pengajuan)
+    {
+        if ($pengajuan->user_id !== Auth::id()) {
+            abort(403);
+        }
+        if ($pengajuan->status !== 'pending') {
+            return redirect()->route('user.pengajuan.show', $pengajuan)
+                ->with('error', 'Pengajuan hanya dapat diedit saat berstatus Pending.');
+        }
+        $jenisSurat = JenisSurat::where('is_active', true)->get();
+        return view('user.pengajuan.edit', compact('pengajuan', 'jenisSurat'));
+    }
+
+    public function userUpdate(Request $request, Pengajuan $pengajuan)
+    {
+        if ($pengajuan->user_id !== Auth::id()) {
+            abort(403);
+        }
+        if ($pengajuan->status !== 'pending') {
+            return redirect()->route('user.pengajuan.show', $pengajuan)
+                ->with('error', 'Pengajuan hanya dapat diedit saat berstatus Pending.');
+        }
+
+        $request->validate([
+            'jenis_surat_id'    => 'required|exists:jenis_surat,id',
+            'keperluan'         => 'required|string|max:255',
+            'keterangan'        => 'nullable|string|max:1000',
+            'dokumen_pendukung' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
+        ]);
+
+        $data = [
+            'jenis_surat_id' => $request->jenis_surat_id,
+            'keperluan'      => $request->keperluan,
+            'keterangan'     => $request->keterangan,
+        ];
+
+        if ($request->hasFile('dokumen_pendukung')) {
+            // Delete old file if exists
+            if ($pengajuan->dokumen_pendukung) {
+                Storage::disk('public')->delete($pengajuan->dokumen_pendukung);
+            }
+            $data['dokumen_pendukung'] = $request->file('dokumen_pendukung')
+                ->store('dokumen', 'public');
+        }
+
+        $pengajuan->update($data);
+
+        return redirect()->route('user.pengajuan.show', $pengajuan)
+            ->with('success', 'Pengajuan berhasil diperbarui.');
+    }
+
+    public function userCancel(Pengajuan $pengajuan)
+    {
+        if ($pengajuan->user_id !== Auth::id()) {
+            abort(403);
+        }
+        if ($pengajuan->status !== 'pending') {
+            return redirect()->route('user.pengajuan.show', $pengajuan)
+                ->with('error', 'Pengajuan hanya dapat dibatalkan saat berstatus Pending.');
+        }
+
+        // Delete uploaded document if exists
+        if ($pengajuan->dokumen_pendukung) {
+            Storage::disk('public')->delete($pengajuan->dokumen_pendukung);
+        }
+
+        $pengajuan->delete();
+
+        return redirect()->route('user.pengajuan.index')
+            ->with('success', 'Pengajuan berhasil dibatalkan.');
+    }
+
     // ===== PDF =====
 
     public function downloadSurat(Surat $surat)

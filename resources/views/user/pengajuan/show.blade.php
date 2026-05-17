@@ -13,6 +13,18 @@
     <a href="{{ route('user.pengajuan.index') }}" class="btn btn-outline-secondary btn-sm">
         <i class="bi bi-arrow-left me-1"></i>Kembali
     </a>
+    @if($pengajuan->status === 'pending')
+    <a href="{{ route('user.pengajuan.edit', $pengajuan) }}" class="btn btn-warning btn-sm">
+        <i class="bi bi-pencil me-1"></i>Edit
+    </a>
+    <form method="POST" action="{{ route('user.pengajuan.cancel', $pengajuan) }}" class="d-inline"
+          onsubmit="return confirm('Yakin ingin membatalkan pengajuan ini?')">
+        @csrf @method('DELETE')
+        <button type="submit" class="btn btn-danger btn-sm">
+            <i class="bi bi-x-circle me-1"></i>Batalkan
+        </button>
+    </form>
+    @endif
 </div>
 
 <div class="row g-3 justify-content-center">
@@ -29,14 +41,14 @@
                     <div class="text-center flex-fill">
                         <div class="rounded-circle d-inline-flex align-items-center justify-content-center mb-1"
                              style="width:36px;height:36px;font-size:.8rem;font-weight:700;
-                                    background:{{ ($current >= $si && $pengajuan->status !== 'ditolak') ? '#2563eb' : '#e2e8f0' }};
+                                    background:{{ ($current >= $si && $pengajuan->status !== 'ditolak') ? '#15803d' : '#e2e8f0' }};
                                     color:{{ ($current >= $si && $pengajuan->status !== 'ditolak') ? '#fff' : '#94a3b8' }};">
                             {{ $si + 1 }}
                         </div>
-                        <div style="font-size:.75rem;color:{{ ($current >= $si && $pengajuan->status !== 'ditolak') ? '#2563eb' : '#94a3b8' }};">{{ $step }}</div>
+                        <div style="font-size:.75rem;color:{{ ($current >= $si && $pengajuan->status !== 'ditolak') ? '#15803d' : '#94a3b8' }};">{{ $step }}</div>
                     </div>
                     @if($si < 2)
-                    <div style="flex:1;height:2px;background:{{ ($current > $si && $pengajuan->status !== 'ditolak') ? '#2563eb' : '#e2e8f0' }};margin-bottom:1.5rem;"></div>
+                    <div style="flex:1;height:2px;background:{{ ($current > $si && $pengajuan->status !== 'ditolak') ? '#15803d' : '#e2e8f0' }};margin-bottom:1.5rem;"></div>
                     @endif
                     @endforeach
                 </div>

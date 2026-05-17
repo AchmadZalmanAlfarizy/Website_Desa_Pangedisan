@@ -37,7 +37,7 @@
                         <th>Keperluan</th>
                         <th>Tanggal</th>
                         <th>Status</th>
-                        <th style="width:120px;">Aksi</th>
+                        <th style="width:180px;">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -52,6 +52,18 @@
                             <a href="{{ route('user.pengajuan.show', $p) }}" class="btn btn-sm btn-outline-primary">
                                 <i class="bi bi-eye me-1"></i>Detail
                             </a>
+                            @if($p->status === 'pending')
+                            <a href="{{ route('user.pengajuan.edit', $p) }}" class="btn btn-sm btn-outline-warning">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <form method="POST" action="{{ route('user.pengajuan.cancel', $p) }}" class="d-inline"
+                                  onsubmit="return confirm('Yakin ingin membatalkan pengajuan ini?')">
+                                @csrf @method('DELETE')
+                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Batalkan">
+                                    <i class="bi bi-x-circle"></i>
+                                </button>
+                            </form>
+                            @endif
                         </td>
                     </tr>
                     @empty
